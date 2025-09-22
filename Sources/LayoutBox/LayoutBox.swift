@@ -10,7 +10,7 @@ import UIKit
 
 /// 布局盒子类型枚举
 /// 用于区分布局元素是单个项目(item)还是组合组(group)
-enum LayoutBoxType : Hashable {
+public enum LayoutBoxType : Hashable {
     /// 表示单个单元格布局
     case item
     /// 表示组合的布局组
@@ -19,7 +19,7 @@ enum LayoutBoxType : Hashable {
 
 /// 布局组方向枚举
 /// 定义组内元素的排列方向
-enum GroupDirection : Hashable {
+public enum GroupDirection : Hashable {
     /// 水平方向排列元素
     case horizontal
     /// 垂直方向排列元素
@@ -27,28 +27,28 @@ enum GroupDirection : Hashable {
 }
 /// NSCollectionLayoutDimension扩展
 /// 提供更简洁的方式创建宽度和高度维度
-extension NSCollectionLayoutDimension {
+public extension NSCollectionLayoutDimension {
     /// 创建基于分数的宽度维度
     /// - Parameter fractionalWidth: 相对父容器的宽度比例(0.0-1.0)
     /// - Returns: 配置好的NSCollectionLayoutDimension实例
-    public class func w(_ fractionalWidth: CGFloat) -> Self{
+    class func w(_ fractionalWidth: CGFloat) -> Self{
         return self.fractionalWidth(fractionalWidth)
     }
     
     /// 创建基于分数的高度维度
     /// - Parameter fractionalHeight: 相对父容器的高度比例(0.0-1.0)
     /// - Returns: 配置好的NSCollectionLayoutDimension实例
-    public class func h(_ fractionalHeight: CGFloat) -> Self{
+    class func h(_ fractionalHeight: CGFloat) -> Self{
         return self.fractionalHeight(fractionalHeight)
     }
 }
 
 /// 布局盒子基础配置类
 /// 所有布局元素(项目和组)的基类，提供共享的布局属性
-class LayoutBoxConfig {
+public class LayoutBoxConfig {
     /// 边缘间距元组类型定义
     /// 用于设置布局元素四个方向的间距
-    typealias EdgeSpacing =  (leading: NSCollectionLayoutSpacing?,  // 左侧间距
+    public typealias EdgeSpacing =  (leading: NSCollectionLayoutSpacing?,  // 左侧间距
                               top: NSCollectionLayoutSpacing?,       // 顶部间距
                               trailing: NSCollectionLayoutSpacing?,  // 右侧间距
                               bottom: NSCollectionLayoutSpacing?)    // 底部间距
@@ -81,12 +81,12 @@ class LayoutBoxConfig {
 }
 /// LayoutBoxConfig扩展
 /// 提供流式接口方法，用于链式配置布局属性
-extension LayoutBoxConfig {
+public extension LayoutBoxConfig {
     /// 设置布局盒子类型
     /// - Parameter boxType: 要设置的布局类型(.item或.group)
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-    public func boxType(_ boxType: LayoutBoxType) -> Self {
+    func boxType(_ boxType: LayoutBoxType) -> Self {
         self.boxType = boxType
         return self
     }
@@ -95,7 +95,7 @@ extension LayoutBoxConfig {
     /// - Parameter itemSize: 要设置的尺寸对象
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-    public func itemSize(itemSize: NSCollectionLayoutSize) -> Self {
+    func itemSize(itemSize: NSCollectionLayoutSize) -> Self {
         self.itemSize = itemSize
         return self
     }
@@ -190,7 +190,7 @@ extension LayoutBoxConfig {
 /// 布局构建器结果构建器
 /// 允许使用函数式语法构建布局配置数组
 @MainActor @resultBuilder
-struct LayoutBuilder {
+public struct LayoutBuilder {
     /// 构建嵌套数组的布局配置
     /// - Parameter components: 布局配置的嵌套数组
     /// - Returns: 展平后的布局配置数组
@@ -207,7 +207,7 @@ struct LayoutBuilder {
 }
 /// LayoutBoxConfig扩展
 /// 提供配置实际布局项的方法
-extension LayoutBoxConfig {
+public extension LayoutBoxConfig {
     /// 将配置应用到实际的集合布局项
     /// - Parameter item: 要配置的NSCollectionLayoutItem实例
     @MainActor func config(item: NSCollectionLayoutItem) {
@@ -227,7 +227,7 @@ extension LayoutBoxConfig {
 /// 项目布局盒子类
 /// 表示单个集合视图单元格的布局配置
 @MainActor
-class ItemLayoutBox: LayoutBoxConfig {
+public class ItemLayoutBox: LayoutBoxConfig {
     /// 列数
     /// 表示要创建的相同项目的数量
     var columns: Int = 1
@@ -258,7 +258,7 @@ class ItemLayoutBox: LayoutBoxConfig {
 /// 表示可以包含多个项目或子组的布局组配置
 ///
 @MainActor
-class GroupLayoutBox: LayoutBoxConfig {
+public class GroupLayoutBox: LayoutBoxConfig {
     /// 组内元素排列方向
     /// 默认值为.horizontal(水平)
     var direction: GroupDirection = .horizontal
@@ -300,7 +300,7 @@ class GroupLayoutBox: LayoutBoxConfig {
     /// 构建布局组
     /// - Returns: 配置好的NSCollectionLayoutGroup实例
     @MainActor @discardableResult
-    func toBuild() -> NSCollectionLayoutGroup {
+    public  func toBuild() -> NSCollectionLayoutGroup {
         var subChilds: [NSCollectionLayoutItem] = []
         var isOnlyItem = true  // 标记是否只包含ItemLayoutBox类型的子项
         
@@ -355,7 +355,7 @@ class GroupLayoutBox: LayoutBoxConfig {
 
 /// 布局构建器示例类
 /// 提供使用本库创建各种复杂布局的示例代码
-class LayoutBuilderExamples {
+ class LayoutBuilderExamples {
     /// 创建嵌套组布局示例
     /// - Returns: 配置好的NSCollectionLayoutSection实例
     @MainActor static func Example1() -> NSCollectionLayoutSection {
