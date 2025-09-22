@@ -74,7 +74,7 @@ public class LayoutBoxConfig {
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
     @MainActor
-    init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
+    public init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         self.itemSize =  NSCollectionLayoutSize(widthDimension: width,
                                                 heightDimension: height)
     }
@@ -237,7 +237,7 @@ public class ItemLayoutBox: LayoutBoxConfig {
     ///   - columns: 要创建的列数/相同项目数量
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
-    init(columns: Int = 1, width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
+    public  init(columns: Int = 1, width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         super.init(width: width, height: height)
         self.boxType = .item  // 设置为项目类型
         self.columns = columns  // 设置列数
@@ -245,7 +245,7 @@ public class ItemLayoutBox: LayoutBoxConfig {
     
     /// 构建布局项目数组
     /// - Returns: 配置好的NSCollectionLayoutItem实例数组
-     func toBuild() -> [NSCollectionLayoutItem] {
+    public  func toBuild() -> [NSCollectionLayoutItem] {
         // 创建基础项目配置
         let item = NSCollectionLayoutItem(layoutSize: self.itemSize)
         // 应用配置
@@ -278,7 +278,7 @@ public class GroupLayoutBox: LayoutBoxConfig {
     ///   - height: 组高度维度配置
     ///   - builder: 用于构建子项目的构建器闭包
     @discardableResult
-    init(direction: GroupDirection = .horizontal,
+    public init(direction: GroupDirection = .horizontal,
          width: NSCollectionLayoutDimension,
          height: NSCollectionLayoutDimension,
          @LayoutBuilder _ builder: () -> [LayoutBoxConfig]) {
