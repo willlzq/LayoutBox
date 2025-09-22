@@ -4,7 +4,7 @@ import XCTest
 final class LayoutBoxTests: XCTestCase {
     
     // 测试基本的项目布局创建
-    func testItemLayoutBoxCreation() throws {
+    @MainActor func testItemLayoutBoxCreation() throws {
         let itemBox = ItemLayoutBox(columns: 2, width: .fractionalWidth(0.5), height: .fractionalHeight(1.0))
         let items = itemBox.toBuild()
         
@@ -19,7 +19,7 @@ final class LayoutBoxTests: XCTestCase {
     }
     
     // 测试基本的组布局创建
-    func testGroupLayoutBoxCreation() throws {
+    @MainActor func testGroupLayoutBoxCreation() throws {
         let groupBox = GroupLayoutBox(width: .fractionalWidth(1.0), height: .absolute(100)) {
             ItemLayoutBox(columns: 1, width: .fractionalWidth(1.0), height: .fractionalHeight(1.0))
         }
@@ -34,7 +34,7 @@ final class LayoutBoxTests: XCTestCase {
     }
     
     // 测试嵌套组布局
-    func testNestedGroupLayout() throws {
+    @MainActor func testNestedGroupLayout() throws {
         let nestedGroupBox = GroupLayoutBox(width: .fractionalWidth(1.0), height: .fractionalHeight(0.4)) {
             ItemLayoutBox(columns: 2, width: .fractionalWidth(0.5), height: .fractionalHeight(1.0))
             
@@ -53,7 +53,7 @@ final class LayoutBoxTests: XCTestCase {
     }
     
     // 测试间距和边缘插入配置
-    func testSpacingAndInsetsConfiguration() throws {
+    @MainActor func testSpacingAndInsetsConfiguration() throws {
         let itemBox = ItemLayoutBox(columns: 1, width: .fractionalWidth(1.0), height: .fractionalHeight(1.0))
             .insets(top: 10, leading: 10, bottom: 10, trailing: 10)
             .leading(.fixed(5))

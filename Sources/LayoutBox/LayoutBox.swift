@@ -74,7 +74,7 @@ public class LayoutBoxConfig {
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
     @MainActor
-    init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
+    public init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         self.itemSize =  NSCollectionLayoutSize(widthDimension: width,
                                                 heightDimension: height)
     }
@@ -104,7 +104,7 @@ public extension LayoutBoxConfig {
     /// - Parameter insets: 边缘插入对象
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-    public func insets(_ insets: NSDirectionalEdgeInsets) -> Self {
+      func insets(_ insets: NSDirectionalEdgeInsets) -> Self {
         self.insets = insets
         return self
     }
@@ -116,7 +116,7 @@ public extension LayoutBoxConfig {
     ///   - bottom: 底部边缘插入值
     ///   - trailing: 右侧边缘插入值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func insets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) -> Self {
+      func insets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) -> Self {
         self.insets = NSDirectionalEdgeInsets.init(top: top, leading: leading, bottom: bottom, trailing: trailing)
         return self
     }
@@ -124,7 +124,7 @@ public extension LayoutBoxConfig {
     /// 设置内容边缘插入(统一值)
     /// - Parameter space: 四个方向的统一边缘插入值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func insets(space: CGFloat) -> Self {
+      func insets(space: CGFloat) -> Self {
         self.insets = NSDirectionalEdgeInsets.init(top: space, leading: space, bottom: space, trailing: space)
         return self
     }
@@ -133,7 +133,7 @@ public extension LayoutBoxConfig {
     /// - Parameter edges: 边缘间距元组
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-    public func edges(_ edges: EdgeSpacing) -> Self {
+      func edges(_ edges: EdgeSpacing) -> Self {
         self.edges = edges
         return self
     }
@@ -141,7 +141,7 @@ public extension LayoutBoxConfig {
     /// 设置左侧边缘间距
     /// - Parameter value: 左侧间距值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func leading(_ value: NSCollectionLayoutSpacing?) -> Self {
+      func leading(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: value, top: nil, trailing: nil, bottom: nil)
         } else {
@@ -153,7 +153,7 @@ public extension LayoutBoxConfig {
     /// 设置顶部边缘间距
     /// - Parameter value: 顶部间距值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func top(_ value: NSCollectionLayoutSpacing?) -> Self {
+      func top(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: value, trailing: nil, bottom: nil)
         } else {
@@ -165,7 +165,7 @@ public extension LayoutBoxConfig {
     /// 设置右侧边缘间距
     /// - Parameter value: 右侧间距值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func trailing(_ value: NSCollectionLayoutSpacing?) -> Self {
+      func trailing(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: nil, trailing: value, bottom: nil)
         } else {
@@ -177,7 +177,7 @@ public extension LayoutBoxConfig {
     /// 设置底部边缘间距
     /// - Parameter value: 底部间距值
     /// - Returns: 返回自身实例，以支持链式调用
-    public func bottom(_ value: NSCollectionLayoutSpacing?) -> Self {
+      func bottom(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: nil, trailing: nil, bottom: value)
         } else {
@@ -237,7 +237,7 @@ public class ItemLayoutBox: LayoutBoxConfig {
     ///   - columns: 要创建的列数/相同项目数量
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
-    init(columns: Int = 1, width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
+    public  init(columns: Int = 1, width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         super.init(width: width, height: height)
         self.boxType = .item  // 设置为项目类型
         self.columns = columns  // 设置列数
@@ -245,7 +245,7 @@ public class ItemLayoutBox: LayoutBoxConfig {
     
     /// 构建布局项目数组
     /// - Returns: 配置好的NSCollectionLayoutItem实例数组
-     func toBuild() -> [NSCollectionLayoutItem] {
+    public  func toBuild() -> [NSCollectionLayoutItem] {
         // 创建基础项目配置
         let item = NSCollectionLayoutItem(layoutSize: self.itemSize)
         // 应用配置
@@ -278,7 +278,7 @@ public class GroupLayoutBox: LayoutBoxConfig {
     ///   - height: 组高度维度配置
     ///   - builder: 用于构建子项目的构建器闭包
     @discardableResult
-    init(direction: GroupDirection = .horizontal,
+    public init(direction: GroupDirection = .horizontal,
          width: NSCollectionLayoutDimension,
          height: NSCollectionLayoutDimension,
          @LayoutBuilder _ builder: () -> [LayoutBoxConfig]) {
@@ -401,4 +401,17 @@ public class GroupLayoutBox: LayoutBoxConfig {
         let section = NSCollectionLayoutSection(group: group)
         return section
     }
+     /// 创建一个标准的网格表格
+     /// - Returns: 配置好的NSCollectionLayoutSection实例
+     @MainActor static func Example3() -> NSCollectionLayoutSection {
+         let group = GroupLayoutBox(direction:.horizontal, width: .w(1.0), height: .absolute(120)) {
+             ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 10)
+           }
+         .leading(.flexible(10)).trailing(.flexible(10)).top(.flexible(10)).bottom(.flexible(10))
+         .toBuild()
+         // 创建并返回基于该组的section
+         let section = NSCollectionLayoutSection(group: group)
+         return section
+     }
+    
 }
