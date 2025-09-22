@@ -20,7 +20,7 @@ LayoutBox是一个优雅的Swift库，用于iOS开发，通过声明式语法简
 在Xcode中，选择File > Add Packages...，然后输入以下URL：
 
 ```
-https://github.com/[YourUsername]/LayoutBox.git
+https://github.com/willlzq/LayoutBox.git
 ```
 
 ### 基本用法
