@@ -49,9 +49,9 @@ public extension NSCollectionLayoutDimension {
     /// 边缘间距元组类型定义
     /// 用于设置布局元素四个方向的间距
     public typealias EdgeSpacing =  (leading: NSCollectionLayoutSpacing?,  // 左侧间距
-                              top: NSCollectionLayoutSpacing?,       // 顶部间距
-                              trailing: NSCollectionLayoutSpacing?,  // 右侧间距
-                              bottom: NSCollectionLayoutSpacing?)    // 底部间距
+                                     top: NSCollectionLayoutSpacing?,       // 顶部间距
+                                     trailing: NSCollectionLayoutSpacing?,  // 右侧间距
+                                     bottom: NSCollectionLayoutSpacing?)    // 底部间距
     
     /// 布局盒子类型
     /// 默认值为.item(项目)
@@ -69,28 +69,40 @@ public extension NSCollectionLayoutDimension {
     /// 控制布局元素与其相邻元素之间的间距
     var edges: EdgeSpacing?
     
-     var isExpression : Bool = false
-    public var listLayoutBoxConfig : [LayoutBoxConfig] = []
-
+    private var isExpression : Bool = false
+    private var listLayoutBoxConfig : [LayoutBoxConfig] = []
+    
     
     /// 初始化布局配置
     /// - Parameters:
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
- 
+    
     public init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         self.itemSize =  NSCollectionLayoutSize(widthDimension: width,
                                                 heightDimension: height)
         self.isExpression = false
-
+        
     }
-      public init(list:[LayoutBoxConfig]) {
-          self.itemSize =  NSCollectionLayoutSize(widthDimension: .w(0),
-                                                  heightDimension: .h(0))
-     
-             self.isExpression = true
-             self.listLayoutBoxConfig = list
-         }
+    public init(list:[LayoutBoxConfig]) {
+        self.itemSize =  NSCollectionLayoutSize(widthDimension: .w(0),
+                                                heightDimension: .h(0))
+        self.isExpression = true
+        self.listLayoutBoxConfig = list
+    }
+    public func subItems() -> [LayoutBoxConfig] {
+        var  list:[LayoutBoxConfig] = []
+        for item in self.listLayoutBoxConfig {
+            if item.isExpression {
+                //使用递归模式，获取所有的子项目
+                list.append(contentsOf: item.subItems())
+            }else {
+                list.append(item)
+            }
+        }
+        return list
+        
+    }
 }
 
 /// LayoutBoxConfig扩展
@@ -118,7 +130,7 @@ public extension LayoutBoxConfig {
     /// - Parameter insets: 边缘插入对象
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-      func insets(_ insets: NSDirectionalEdgeInsets) -> Self {
+    func insets(_ insets: NSDirectionalEdgeInsets) -> Self {
         self.insets = insets
         return self
     }
@@ -130,7 +142,7 @@ public extension LayoutBoxConfig {
     ///   - bottom: 底部边缘插入值
     ///   - trailing: 右侧边缘插入值
     /// - Returns: 返回自身实例，以支持链式调用
-      func insets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) -> Self {
+    func insets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) -> Self {
         self.insets = NSDirectionalEdgeInsets.init(top: top, leading: leading, bottom: bottom, trailing: trailing)
         return self
     }
@@ -138,7 +150,7 @@ public extension LayoutBoxConfig {
     /// 设置内容边缘插入(统一值)
     /// - Parameter space: 四个方向的统一边缘插入值
     /// - Returns: 返回自身实例，以支持链式调用
-      func insets(space: CGFloat) -> Self {
+    func insets(space: CGFloat) -> Self {
         self.insets = NSDirectionalEdgeInsets.init(top: space, leading: space, bottom: space, trailing: space)
         return self
     }
@@ -147,7 +159,7 @@ public extension LayoutBoxConfig {
     /// - Parameter edges: 边缘间距元组
     /// - Returns: 返回自身实例，以支持链式调用
     @discardableResult
-      func edges(_ edges: EdgeSpacing) -> Self {
+    func edges(_ edges: EdgeSpacing) -> Self {
         self.edges = edges
         return self
     }
@@ -155,7 +167,7 @@ public extension LayoutBoxConfig {
     /// 设置左侧边缘间距
     /// - Parameter value: 左侧间距值
     /// - Returns: 返回自身实例，以支持链式调用
-      func leading(_ value: NSCollectionLayoutSpacing?) -> Self {
+    func leading(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: value, top: nil, trailing: nil, bottom: nil)
         } else {
@@ -167,7 +179,7 @@ public extension LayoutBoxConfig {
     /// 设置顶部边缘间距
     /// - Parameter value: 顶部间距值
     /// - Returns: 返回自身实例，以支持链式调用
-      func top(_ value: NSCollectionLayoutSpacing?) -> Self {
+    func top(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: value, trailing: nil, bottom: nil)
         } else {
@@ -179,7 +191,7 @@ public extension LayoutBoxConfig {
     /// 设置右侧边缘间距
     /// - Parameter value: 右侧间距值
     /// - Returns: 返回自身实例，以支持链式调用
-      func trailing(_ value: NSCollectionLayoutSpacing?) -> Self {
+    func trailing(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: nil, trailing: value, bottom: nil)
         } else {
@@ -191,7 +203,7 @@ public extension LayoutBoxConfig {
     /// 设置底部边缘间距
     /// - Parameter value: 底部间距值
     /// - Returns: 返回自身实例，以支持链式调用
-      func bottom(_ value: NSCollectionLayoutSpacing?) -> Self {
+    func bottom(_ value: NSCollectionLayoutSpacing?) -> Self {
         if edges == nil {
             self.edges = (leading: nil, top: nil, trailing: nil, bottom: value)
         } else {
@@ -200,7 +212,7 @@ public extension LayoutBoxConfig {
         return self
     }
 }
- 
+
 /// 布局构建器结果构建器
 /// 允许使用函数式语法构建布局配置数组
 @MainActor @resultBuilder
@@ -227,7 +239,7 @@ public struct LayoutBuilder {
         }
     }
     
-  
+    
 }
 /// LayoutBoxConfig扩展
 /// 提供配置实际布局项的方法
@@ -242,9 +254,9 @@ public extension LayoutBoxConfig {
         // 应用边缘间距配置
         if let edgeSpacing = self.edges {
             item.edgeSpacing = NSCollectionLayoutEdgeSpacing.init(leading: edgeSpacing.leading,
-                                                                 top: edgeSpacing.top,
-                                                                 trailing: edgeSpacing.trailing,
-                                                                 bottom: edgeSpacing.bottom)
+                                                                  top: edgeSpacing.top,
+                                                                  trailing: edgeSpacing.trailing,
+                                                                  bottom: edgeSpacing.bottom)
         }
     }
 }
@@ -303,18 +315,13 @@ public class GroupLayoutBox: LayoutBoxConfig {
     ///   - builder: 用于构建子项目的构建器闭包
     @discardableResult
     public init(direction: GroupDirection = .horizontal,
-         width: NSCollectionLayoutDimension,
-         height: NSCollectionLayoutDimension,
-         @LayoutBuilder _ builder: () -> LayoutBoxConfig) {
+                width: NSCollectionLayoutDimension,
+                height: NSCollectionLayoutDimension,
+                @LayoutBuilder _ builder: () -> LayoutBoxConfig) {
         super.init(width: width, height: height)
         self.boxType = .group  // 设置为组类型
         self.direction = direction  // 设置排列方向
-        let layout  =  builder()
-        if layout.isExpression {
-            self.subitems = layout.listLayoutBoxConfig  // 获取子项目配置
-        }else {
-            self.subitems = [layout]
-        }
+        self.subitems = builder().subItems()
     }
     
     /// 设置组内项目间距
@@ -343,16 +350,16 @@ public class GroupLayoutBox: LayoutBoxConfig {
                 // 处理组类型子项(嵌套组)
                 if let layout = item as? GroupLayoutBox {
                     subChilds.append(layout.toBuild())
-                 }
+                }
             }
         }
         let group = direction == .horizontal ?
-                NSCollectionLayoutGroup.horizontal(layoutSize: self.itemSize,
-                                                   subitems: subChilds)
-                :
-                NSCollectionLayoutGroup.vertical(layoutSize: self.itemSize,
-                                                 subitems: subChilds)
-      
+        NSCollectionLayoutGroup.horizontal(layoutSize: self.itemSize,
+                                           subitems: subChilds)
+        :
+        NSCollectionLayoutGroup.vertical(layoutSize: self.itemSize,
+                                         subitems: subChilds)
+        
         
         // 应用基础配置和间距配置
         config(item: group)
@@ -366,7 +373,7 @@ public class GroupLayoutBox: LayoutBoxConfig {
 
 /// 布局构建器示例类
 /// 提供使用本库创建各种复杂布局的示例代码
- class LayoutBuilderExamples {
+class LayoutBuilderExamples {
     /// 创建嵌套组布局示例
     /// - Returns: 配置好的NSCollectionLayoutSection实例
     @MainActor static func Example1() -> NSCollectionLayoutSection {
@@ -383,8 +390,8 @@ public class GroupLayoutBox: LayoutBoxConfig {
                     .insets(NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
             }
         }
-        .insets(NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))  // 外部组的边缘插入
-        .toBuild()  // 构建组
+            .insets(NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))  // 外部组的边缘插入
+            .toBuild()  // 构建组
         
         // 创建并返回基于该组的section
         let section = NSCollectionLayoutSection(group: nestedGroup)
@@ -403,37 +410,52 @@ public class GroupLayoutBox: LayoutBoxConfig {
             // 高度85的项目
             ItemLayoutBox(columns: 1, width: .absolute(110), height: .absolute(85))
         }
-        .space(.fixed(5))  // 项目间距5
-        .leading(.flexible(5))  // 左侧弹性间距5
-        .trailing(.flexible(5))  // 右侧弹性间距5
-        .toBuild()  // 构建组
+            .space(.fixed(5))  // 项目间距5
+            .leading(.flexible(5))  // 左侧弹性间距5
+            .trailing(.flexible(5))  // 右侧弹性间距5
+            .toBuild()  // 构建组
         
         // 创建并返回基于该组的section
         let section = NSCollectionLayoutSection(group: group)
         return section
     }
-     /// 创建一个标准的网格表格
-     /// - Returns: 配置好的NSCollectionLayoutSection实例
-     @MainActor static func Example3() -> NSCollectionLayoutSection {
-         //测试for 和 if 语法
-         let testForAndif = true
-         let group = GroupLayoutBox(direction:.horizontal, width: .w(1.0), height: .absolute(120)) {
-             if testForAndif {
-                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 30)
-                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 20)
-                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 10)
-                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 0)
-             }else {
-                 for i in 0..<10 {
-                     ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: CGFloat(i) * 0.5)
+    /// 创建一个标准的网格表格
+    /// - Returns: 配置好的NSCollectionLayoutSection实例
+    @MainActor static func Example3() -> NSCollectionLayoutSection {
+        //测试for 和 if 语法
+        let testForAndif = true
+        let group = GroupLayoutBox(direction:.horizontal, width: .w(1.0), height: .absolute(120)) {
+            if testForAndif {
+                // 字符线条模式展示大小差异的网格布局:
+                // ┌─────────────┐  ┌─────────────┐   ┌─────────────┐ ┌─────────────┐ ┌───────┐ ┌───────┐
+                // │  width:0.20 │  │  width:0.20 │   │  width:0.20 │ │  width:0.20 │ │0.10  │ │0.10  │
+                // │  space:20   │  │  space:10   │   │space:i*10  │ │space:i*10  │ │space:1│ │space:5│
+                // └─────────────┘  └─────────────┘   └─────────────┘ └─────────────┘ └───────┘ └───────┘
+                ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: 20)
+                ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: 10)
+                
+                for i in 0..<2 {
+                    ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: CGFloat(i) * 10)
                 }
-             }
-           }
-         .leading(.flexible(10)).trailing(.flexible(10)).top(.flexible(10)).bottom(.flexible(10))
-         .toBuild()
-         // 创建并返回基于该组的section
-         let section = NSCollectionLayoutSection(group: group)
-         return section
-     }
+                
+                ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: 1)
+                ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: 5)
+            }else {
+                // 字符线条模式展示10个等宽网格项（宽度均为0.1，间距从0到4.5递增）:
+                // ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+                // │i=0 │ │i=1 │ │i=2 │ │i=3 │ │i=4 │ │i=5 │ │i=6 │ │i=7 │ │i=8 │ │i=9 │
+                // │0.0 │ │0.5 │ │1.0 │ │1.5 │ │2.0 │ │2.5 │ │3.0 │ │3.5 │ │4.0 │ │4.5 │
+                // └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘
+                for i in 0..<10 {
+                    ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: CGFloat(i) * 0.5)
+                }
+            }
+        }
+            .leading(.flexible(10)).trailing(.flexible(10)).top(.flexible(10)).bottom(.flexible(10))
+            .toBuild()
+        // 创建并返回基于该组的section
+        let section = NSCollectionLayoutSection(group: group)
+        return section
+    }
     
 }
