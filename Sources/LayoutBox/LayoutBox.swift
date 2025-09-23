@@ -45,7 +45,7 @@ public extension NSCollectionLayoutDimension {
 
 /// 布局盒子基础配置类
 /// 所有布局元素(项目和组)的基类，提供共享的布局属性
-public class LayoutBoxConfig {
+@MainActor public class LayoutBoxConfig {
     /// 边缘间距元组类型定义
     /// 用于设置布局元素四个方向的间距
     public typealias EdgeSpacing =  (leading: NSCollectionLayoutSpacing?,  // 左侧间距
@@ -69,16 +69,30 @@ public class LayoutBoxConfig {
     /// 控制布局元素与其相邻元素之间的间距
     var edges: EdgeSpacing?
     
+     var isExpression : Bool = false
+    public var listLayoutBoxConfig : [LayoutBoxConfig] = []
+
+    
     /// 初始化布局配置
     /// - Parameters:
     ///   - width: 宽度维度配置
     ///   - height: 高度维度配置
-    @MainActor
+ 
     public init(width: NSCollectionLayoutDimension, height: NSCollectionLayoutDimension){
         self.itemSize =  NSCollectionLayoutSize(widthDimension: width,
                                                 heightDimension: height)
+        self.isExpression = false
+
     }
+      public init(list:[LayoutBoxConfig]) {
+          self.itemSize =  NSCollectionLayoutSize(widthDimension: .w(0),
+                                                  heightDimension: .h(0))
+     
+             self.isExpression = true
+             self.listLayoutBoxConfig = list
+         }
 }
+
 /// LayoutBoxConfig扩展
 /// 提供流式接口方法，用于链式配置布局属性
 public extension LayoutBoxConfig {
@@ -186,24 +200,34 @@ public extension LayoutBoxConfig {
         return self
     }
 }
-
+ 
 /// 布局构建器结果构建器
 /// 允许使用函数式语法构建布局配置数组
 @MainActor @resultBuilder
 public struct LayoutBuilder {
-    /// 构建嵌套数组的布局配置
-    /// - Parameter components: 布局配置的嵌套数组
-    /// - Returns: 展平后的布局配置数组
-    static func buildArray(_ components: [[LayoutBoxConfig]]) -> [LayoutBoxConfig] {
-        Array(components.joined())
+    public static func buildEither(first component: LayoutBoxConfig) -> LayoutBoxConfig {
+        component
     }
     
+    public static func buildEither(second component: LayoutBoxConfig) -> LayoutBoxConfig {
+        component
+    }
+    public static func buildArray(_ components: [LayoutBoxConfig]) -> LayoutBoxConfig {
+        //使用for 循环
+        LayoutBoxConfig(list: components)
+    }
     /// 构建单个布局配置块
     /// - Parameter components: 可变数量的布局配置项
     /// - Returns: 布局配置数组
-    public static func buildBlock(_ components: LayoutBoxConfig...) -> [LayoutBoxConfig] {
-        components
+    public static func buildBlock(_ components: LayoutBoxConfig...) -> LayoutBoxConfig {
+        if components.count == 1 {
+            components.first!
+        }else {
+            LayoutBoxConfig(list: components)
+        }
     }
+    
+  
 }
 /// LayoutBoxConfig扩展
 /// 提供配置实际布局项的方法
@@ -281,11 +305,16 @@ public class GroupLayoutBox: LayoutBoxConfig {
     public init(direction: GroupDirection = .horizontal,
          width: NSCollectionLayoutDimension,
          height: NSCollectionLayoutDimension,
-         @LayoutBuilder _ builder: () -> [LayoutBoxConfig]) {
+         @LayoutBuilder _ builder: () -> LayoutBoxConfig) {
         super.init(width: width, height: height)
         self.boxType = .group  // 设置为组类型
         self.direction = direction  // 设置排列方向
-        self.subitems = builder()  // 获取子项目配置
+        let layout  =  builder()
+        if layout.isExpression {
+            self.subitems = layout.listLayoutBoxConfig  // 获取子项目配置
+        }else {
+            self.subitems = [layout]
+        }
     }
     
     /// 设置组内项目间距
@@ -302,8 +331,6 @@ public class GroupLayoutBox: LayoutBoxConfig {
     @MainActor @discardableResult
     public  func toBuild() -> NSCollectionLayoutGroup {
         var subChilds: [NSCollectionLayoutItem] = []
-        var isOnlyItem = true  // 标记是否只包含ItemLayoutBox类型的子项
-        
         // 处理所有子项配置
         for item in self.subitems {
             switch item.boxType {
@@ -316,32 +343,16 @@ public class GroupLayoutBox: LayoutBoxConfig {
                 // 处理组类型子项(嵌套组)
                 if let layout = item as? GroupLayoutBox {
                     subChilds.append(layout.toBuild())
-                    isOnlyItem = false  // 包含子组，标记为非纯项目组
-                }
+                 }
             }
         }
-        
-        let group: NSCollectionLayoutGroup!
-        // 检查iOS版本并决定使用哪种构建方式
-        if isOnlyItem && subChilds.count > 1, #available(iOS 16.0, *) {
-            // iOS 16+且只包含相同类型项目时，使用更高效的重复子项创建方式
-            group = direction == .horizontal ?
-                NSCollectionLayoutGroup.horizontal(layoutSize: self.itemSize,
-                                                   repeatingSubitem: subChilds.first!,
-                                                   count: subChilds.count)
-                :
-                NSCollectionLayoutGroup.vertical(layoutSize: self.itemSize,
-                                                 repeatingSubitem: subChilds.first!,
-                                                 count: subChilds.count)
-        } else {
-            // 标准方式创建布局组
-            group = direction == .horizontal ?
+        let group = direction == .horizontal ?
                 NSCollectionLayoutGroup.horizontal(layoutSize: self.itemSize,
                                                    subitems: subChilds)
                 :
                 NSCollectionLayoutGroup.vertical(layoutSize: self.itemSize,
                                                  subitems: subChilds)
-        }
+      
         
         // 应用基础配置和间距配置
         config(item: group)
@@ -404,8 +415,19 @@ public class GroupLayoutBox: LayoutBoxConfig {
      /// 创建一个标准的网格表格
      /// - Returns: 配置好的NSCollectionLayoutSection实例
      @MainActor static func Example3() -> NSCollectionLayoutSection {
+         //测试for 和 if 语法
+         let testForAndif = true
          let group = GroupLayoutBox(direction:.horizontal, width: .w(1.0), height: .absolute(120)) {
-             ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 10)
+             if testForAndif {
+                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 30)
+                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 20)
+                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 10)
+                 ItemLayoutBox(columns: 1, width: .w(0.25), height: .h(1.0)).insets(space: 0)
+             }else {
+                 for i in 0..<10 {
+                     ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: CGFloat(i) * 0.5)
+                }
+             }
            }
          .leading(.flexible(10)).trailing(.flexible(10)).top(.flexible(10)).bottom(.flexible(10))
          .toBuild()
