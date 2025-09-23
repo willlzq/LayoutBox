@@ -94,6 +94,41 @@ let verticalGroupLayout = GroupLayoutBox(direction: .vertical, width: .absolute(
 
 let section = NSCollectionLayoutSection(group: verticalGroupLayout)
 ```
+### 示例3：支持for 和 if 语法
+```swift
+        //测试for 和 if 语法
+        let testForAndif = true
+        let group = GroupLayoutBox(direction:.horizontal, width: .w(1.0), height: .absolute(120)) {
+            if testForAndif {
+                // 字符线条模式展示大小差异的网格布局:
+                // ┌─────────────┐  ┌─────────────┐   ┌─────────────┐ ┌─────────────┐ ┌───────┐ ┌───────┐
+                // │  width:0.20 │  │  width:0.20 │   │  width:0.20 │ │  width:0.20 │ │0.10  │ │0.10  │
+                // │  space:20   │  │  space:10   │   │space:i*10  │ │space:i*10  │ │space:1│ │space:5│
+                // └─────────────┘  └─────────────┘   └─────────────┘ └─────────────┘ └───────┘ └───────┘
+                ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: 20)
+                ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: 10)
+                
+                for i in 0..<2 {
+                    ItemLayoutBox(columns: 1, width: .w(0.20), height: .h(1.0)).insets(space: CGFloat(i) * 10)
+                }
+                
+                ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: 1)
+                ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: 5)
+            }else {
+                // 字符线条模式展示10个等宽网格项（宽度均为0.1，间距从0到4.5递增）:
+                // ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+                // │i=0 │ │i=1 │ │i=2 │ │i=3 │ │i=4 │ │i=5 │ │i=6 │ │i=7 │ │i=8 │ │i=9 │
+                // │0.0 │ │0.5 │ │1.0 │ │1.5 │ │2.0 │ │2.5 │ │3.0 │ │3.5 │ │4.0 │ │4.5 │
+                // └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘
+                for i in 0..<10 {
+                    ItemLayoutBox(columns: 1, width: .w(0.1), height: .h(1.0)).insets(space: CGFloat(i) * 0.5)
+                }
+            }
+        }
+            .leading(.flexible(10)).trailing(.flexible(10)).top(.flexible(10)).bottom(.flexible(10))
+            .toBuild()
+        // 创建并返回基于该组的section
+ ```
 
 ## API参考
 
