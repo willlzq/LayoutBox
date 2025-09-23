@@ -70,7 +70,7 @@ public extension NSCollectionLayoutDimension {
     var edges: EdgeSpacing?
     
     private var isExpression : Bool = false
-    private var listLayoutBoxConfig : [LayoutBoxConfig] = []
+    private var selflist : [LayoutBoxConfig] = []
     
     
     /// 初始化布局配置
@@ -88,11 +88,11 @@ public extension NSCollectionLayoutDimension {
         self.itemSize =  NSCollectionLayoutSize(widthDimension: .w(0),
                                                 heightDimension: .h(0))
         self.isExpression = true
-        self.listLayoutBoxConfig = list
+        self.selflist = list
     }
     public func subItems() -> [LayoutBoxConfig] {
         var  list:[LayoutBoxConfig] = []
-        for item in self.listLayoutBoxConfig {
+        for item in self.selflist {
             if item.isExpression {
                 //使用递归模式，获取所有的子项目
                 list.append(contentsOf: item.subItems())
@@ -100,8 +100,7 @@ public extension NSCollectionLayoutDimension {
                 list.append(item)
             }
         }
-        return list
-        
+        return list.count == 0 ? [self] : list
     }
 }
 
@@ -218,10 +217,12 @@ public extension LayoutBoxConfig {
 @MainActor @resultBuilder
 public struct LayoutBuilder {
     public static func buildEither(first component: LayoutBoxConfig) -> LayoutBoxConfig {
+        //使用if first
         component
     }
     
     public static func buildEither(second component: LayoutBoxConfig) -> LayoutBoxConfig {
+        //使用if second
         component
     }
     public static func buildArray(_ components: [LayoutBoxConfig]) -> LayoutBoxConfig {
@@ -457,5 +458,34 @@ class LayoutBuilderExamples {
         let section = NSCollectionLayoutSection(group: group)
         return section
     }
-    
+    @MainActor static func Example4() -> UICollectionViewLayout {
+        //🌈表格
+        let group = GroupLayoutBox(direction:.vertical, width: .w(1.0), height: .h(1.0)) {
+            GroupLayoutBox(direction: .horizontal, width: .w(1.0), height: .h(0.4)) {
+                GroupLayoutBox(direction: .vertical, width: .w(2.0/3.0), height: .h(1.0)) {
+                    ItemLayoutBox(columns: 1, width: .w(1.0), height: .h(2.0/3.0)).insets(space: 2)
+                    ItemLayoutBox(columns: 1, width: .w(1.0), height: .h(1.0/3.0)).insets(space: 2)
+                }
+                GroupLayoutBox(direction: .vertical, width: .w(1.0/3.0), height: .h(1.0)) {
+                    ItemLayoutBox(columns: 1, width: .w(1.0), height: .h(1.0/3.0)).insets(space: 2)
+                    ItemLayoutBox(columns: 1, width: .w(1.0), height: .h(2.0/3.0)).insets(space: 2)
+                }
+            }
+            GroupLayoutBox(direction: .horizontal, width: .w(1.0), height: .h(1.0/7)) {
+                ItemLayoutBox(columns: 1, width: .w(1.0/3.0), height: .h(1.0)).insets(space: 2)
+                ItemLayoutBox(columns: 1, width: .w(2.0/3.0), height: .h(1.0)).insets(space: 2)
+            }
+            GroupLayoutBox(direction: .horizontal, width: .w(1.0), height: .h(3.0/7)) {
+                ItemLayoutBox(columns: 1, width: .w(2.0/3.0), height: .h(1)).insets(space: 2)
+                GroupLayoutBox(direction: .vertical, width: .w(1.0/3.0), height: .h(1)) {
+                    ItemLayoutBox(columns: 3, width: .w(1.0), height: .h(1.0/3.0)).insets(space: 2)
+                }
+            }
+        }.insets(space: 5)
+            .toBuild()
+        // 创建并返回基于该组的section
+        let section = NSCollectionLayoutSection(group: group)
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+    }
 }
