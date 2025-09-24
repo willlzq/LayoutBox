@@ -1,12 +1,6 @@
 # LayoutBox
 
 LayoutBox是一个优雅的Swift库，用于iOS开发，通过声明式语法简化UICollectionViewCompositionalLayout的创建过程。它提供了一种简洁、直观的方式来构建复杂的集合视图布局，使您能够专注于应用程序的业务逻辑而非繁琐的布局代码。
-<img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1b7daf72a0e6405ea6d6eae74601fdbd~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgd2lsbGx6cQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzM0NDAzNzMxMDExMzkxNSJ9&rk3s=e9ecf3d6&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1758767156&x-orig-sign=RXfL%2FM6X0c5JPtbQajoIL8SJEbY%3D" alt="Simulator Screenshot - iPhone 16 - 2025-09-24 at 10.13.42.png" width="50%" />
-<img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/db0a9e43f0234c59a280977a4f969d29~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgd2lsbGx6cQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzM0NDAzNzMxMDExMzkxNSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1759285516&x-orig-sign=dERqoaRWHNCfVLnIs5VhKC7h0%2FY%3D" alt="Simulator Screenshot - iPhone 16 - 2025-09-23 at 14.54.37.png" width="50%">
-
-<img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/653e5ded3a7b4cf8b44e8d24d7438fb9~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgd2lsbGx6cQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzM0NDAzNzMxMDExMzkxNSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1759285516&x-orig-sign=PWfF2ZCCqvRDSdcwGQTvjzDQ%2F9s%3D" alt="Simulator Screenshot - iPhone 16 - 2025-09-23 at 17.22.54.png" width="50%">
-
-<img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/0494c690f52a46cba2d163f3b087eb50~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgd2lsbGx6cQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzM0NDAzNzMxMDExMzkxNSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1759285516&x-orig-sign=uEhF4qd8xjmti4tS1Ps2hzf7cGg%3D" alt="Simulator Screenshot - iPhone 16 - 2025-09-23 at 17.55.35.png" width="50%">
 ## 特性
 
 - **声明式语法**：使用简洁明了的声明式API构建复杂布局
